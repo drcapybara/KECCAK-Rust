@@ -1,5 +1,5 @@
 use std::ops::BitXor;
-use range::Range;
+
 
 fn main() {
 
@@ -31,14 +31,18 @@ fn main() {
     let j: u16;
     let r: u16;
 
-    let t: u64;
+    let t: u64; 
 
-    let st: [u64; 25];
+    let st: [u64; 25] = [0; 25];
 
-    let mut bc: [u64; 5];
+    let mut bc: [u64; 5] = [0; 5];
+        bc[0] = 0;
+        bc[1] = 0;
 
+
+    /* Theta Step */
     for i in 0..5 {
-        bc[i] ^ st[i]; 
+        bc[i] = st[i] ^ st[i + 5] ^ st[i + 10] ^ st[i + 15] ^ st[i + 20];
     }
 
 }
