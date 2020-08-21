@@ -1,6 +1,9 @@
+use std::ops::BitXor;
+use range::Range;
+
 fn main() {
 
-    
+
     /*Initialize constants */
 
     let keccakf_rndc: [u64; 24] = 
@@ -30,10 +33,12 @@ fn main() {
 
     let t: u64;
 
+    let st: [u64; 25];
+
     let mut bc: [u64; 5];
 
-    for idx in bc.iter() {
-
+    for i in 0..5 {
+        bc[i] ^ st[i]; 
     }
 
 }
