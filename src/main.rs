@@ -1,6 +1,9 @@
 use std::ops::BitXor;
-
-
+/**
+ * A port of the C version of tinySha3 by Markku-Juhani O. Saarinen found at 
+ * https://github.com/mjosaarinen/tiny_sha3/blob/master/sha3.c
+ * 
+ */
 
 fn main() {
 
@@ -19,12 +22,12 @@ fn main() {
         0x8000000000008080, 0x0000000080000001, 0x8000000080008008];
 
     
-
-    let keccakf_rotc: [u32;24] = 
+    let keccakf_rotc: [u64;24] = 
         [1,  3,  6,  10, 15, 21, 28, 36, 45, 55, 2,  14,
         27, 41, 56, 8,  25, 43, 62, 18, 39, 61, 20, 44];
 
-    let keccakf_piln: [u32; 24] = 
+    //set to type usize since these will be used for iterating
+    let keccakf_piln: [usize; 24] = 
         [10, 7,  11, 17, 18, 3, 5,  16, 8,  21, 24, 4,
         15, 23, 19, 13, 12, 2, 20, 14, 22, 9,  6,  1];
 
@@ -40,20 +43,33 @@ fn main() {
 
     /* Theta Step */
     for i in 0..5 {
+        //bc[i] = st[i] ^ st[i + 5] ^ st[i + 10] ^ st[i + 15] ^ st[i + 20];
         bc[i] = bitxor64(bitxor64(bitxor64(bitxor64(st[i], st[i + 5]), st[i + 10]), st[i + 15]), st[i + 20]);
     }
     for i in 0..5 {
+        //t = bc[(i + 4) % 5] ^ ROTL64(bc[(i + 1) % 5], 1);   
         t = bitxor64(bc[(i + 4) % 5], ROTL64(bc[(i + 1) % 5], 1));
         
         j = 0;
         while j < 25 {
         st[j + i] ^= t;
         j = j + 5;
+        }
     }
+
+
+    /* Rho Pi step */
+    t = st[1];
+    i = 0;
+    for i in 0..24 {
+        j = keccakf_piln[i];
+        bc[0] = st[j];
+        st[j] = ROTL64(t, keccakf_rotc[i]);
+        t = bc[0];
     }
+
 
 }
-
 
 
 
