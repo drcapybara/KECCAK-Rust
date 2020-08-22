@@ -59,10 +59,11 @@ fn main() {
             //t = bc[(i + 4) % 5] ^ ROTL64(bc[(i + 1) % 5], 1);   
             t = bitxor64(bc[(i + 4) % 5], ROTL64(bc[(i + 1) % 5], 1));
             
+            //reset iterators before each use.
             j = 0;
             while j < 25 {
-            st[j + i] ^= t;
-            j = j + 5;
+                st[j + i] ^= t;
+                j = j + 5;
             }
         }
 
