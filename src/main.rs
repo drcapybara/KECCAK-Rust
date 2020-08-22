@@ -1,9 +1,10 @@
 use std::ops::BitXor;
+
 /**
- * A port of the C version of tinySha3 by Markku-Juhani O. Saarinen found at 
- * https://github.com/mjosaarinen/tiny_sha3/blob/master/sha3.c
- * 
- * Dustin Ray - Summer 2020
+    A port of the C version of tinySha3 by Markku-Juhani O. Saarinen found at 
+    https://github.com/mjosaarinen/tiny_sha3/blob/master/sha3.c
+    
+    Dustin Ray - Summer 2020
  */
 
 fn main() {
@@ -33,18 +34,20 @@ fn main() {
         [10, 7,  11, 17, 18, 3, 5,  16, 8,  21, 24, 4,
         15, 23, 19, 13, 12, 2, 20, 14, 22, 9,  6,  1];
 
-
+    //variables for iteration; set to usize
     let mut i: usize;
     let mut j: usize;
     let mut r: usize;
 
     let mut t: u64; 
-
+    //state array of 25, 64 bit words
     let mut st: [u64; 25] = [0; 25];
+    
     let mut bc: [u64; 5] = [0; 5];
 
     r = 0;
     
+    //main loop will run exactly ROUNDS number of times, := 24 in this example. 
     for r in 0..KECCAKF_ROUNDS {
 
         /* Theta Step */
@@ -90,7 +93,7 @@ fn main() {
             j = j + 5;
         }
 
-        /* Iota Step*/
+        /* Iota Step */
         st[0] ^= keccakf_rndc[r];
 
     }
@@ -98,11 +101,19 @@ fn main() {
 }
 
 
-///u64 XOR function, https://doc.rust-lang.org/std/primitive.u64.html
+/**
+    u64 XOR function, https://doc.rust-lang.org/std/primitive.u64.html
+    param this is 64 bit unsigned word
+    param other is 64 bit unsigned word
+    return value is 64 bit unsigned result of this XORed with other
+*/
 fn bitxor64(this: u64, other: u64) -> <u64 as BitXor<u64>>::Output {
     return this ^ other;
 }
 
+/** 
+    ROTL64 function from KECCAK specifications. 
+*/
 fn ROTL64(x: u64, y: u64) -> u64 {
    return ((x) << (y)) | ((x) >> (64 - (y)));
 }
