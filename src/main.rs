@@ -1,6 +1,7 @@
 use std::ops::BitXor;
 
 
+
 fn main() {
 
 
@@ -18,31 +19,45 @@ fn main() {
 
     
 
-    let keccakf_rotc: [u16;24] = 
+    let keccakf_rotc: [u32;24] = 
         [1,  3,  6,  10, 15, 21, 28, 36, 45, 55, 2,  14,
         27, 41, 56, 8,  25, 43, 62, 18, 39, 61, 20, 44];
 
-    let keccakf_piln: [u16; 24] = 
+    let keccakf_piln: [u32; 24] = 
         [10, 7,  11, 17, 18, 3, 5,  16, 8,  21, 24, 4,
         15, 23, 19, 13, 12, 2, 20, 14, 22, 9,  6,  1];
 
 
-    let i: u16;
-    let j: u16;
-    let r: u16;
+    let i: u32;
+    let j: u32;
+    let r: u32;
 
-    let t: u64; 
+    type Output = <u64 as BitXor<u64>>::Output;
 
-    let st: [u64; 25] = [0; 25];
+    let mut t: u64; 
 
+    let mut st: [u64; 25] = [0; 25];
     let mut bc: [u64; 5] = [0; 5];
-        bc[0] = 0;
-        bc[1] = 0;
-
 
     /* Theta Step */
     for i in 0..5 {
-        bc[i] = st[i] ^ st[i + 5] ^ st[i + 10] ^ st[i + 15] ^ st[i + 20];
+        bc[i] = bitxor64(bitxor64(bitxor64(bitxor64(st[i], st[i + 5]), st[i + 10]), st[i + 15]), st[i + 20]);
     }
 
+
+
+
+    for i in 0..5 {
+        t = bitxor64(bc[(i + 4) % 5], ROTL64(bc[(i + 1) % 5], 1));
+    }
+
+}
+
+///u64 XOR function, https://doc.rust-lang.org/std/primitive.u64.html
+fn bitxor64(this: u64, other: u64) -> <u64 as BitXor<u64>>::Output {
+    return this ^ other;
+}
+
+fn ROTL64(x: u64, y: u64) -> u64 {
+   return ((x) << (y)) | ((x) >> (64 - (y)));
 }
