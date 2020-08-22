@@ -4,6 +4,7 @@ use std::ops::BitXor;
 
 fn main() {
 
+    let KECCAKF_ROUNDS: u32; 24;
 
     /*Initialize constants */
 
@@ -28,11 +29,9 @@ fn main() {
         15, 23, 19, 13, 12, 2, 20, 14, 22, 9,  6,  1];
 
 
-    let i: u32;
-    let j: u32;
-    let r: u32;
-
-    type Output = <u64 as BitXor<u64>>::Output;
+    let mut i: usize;
+    let mut j: usize;
+    let mut r: usize;
 
     let mut t: u64; 
 
@@ -43,15 +42,20 @@ fn main() {
     for i in 0..5 {
         bc[i] = bitxor64(bitxor64(bitxor64(bitxor64(st[i], st[i + 5]), st[i + 10]), st[i + 15]), st[i + 20]);
     }
-
-
-
-
     for i in 0..5 {
         t = bitxor64(bc[(i + 4) % 5], ROTL64(bc[(i + 1) % 5], 1));
+        
+        j = 0;
+        while j < 25 {
+        st[j + i] ^= t;
+        j = j + 5;
+    }
     }
 
 }
+
+
+
 
 ///u64 XOR function, https://doc.rust-lang.org/std/primitive.u64.html
 fn bitxor64(this: u64, other: u64) -> <u64 as BitXor<u64>>::Output {
