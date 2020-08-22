@@ -3,11 +3,13 @@ use std::ops::BitXor;
  * A port of the C version of tinySha3 by Markku-Juhani O. Saarinen found at 
  * https://github.com/mjosaarinen/tiny_sha3/blob/master/sha3.c
  * 
+ * Dustin Ray - Summer 2020
  */
 
 fn main() {
 
-    let KECCAKF_ROUNDS: u32; 24;
+    let KECCAKF_ROUNDS: usize;
+    KECCAKF_ROUNDS = 24;
 
     /*Initialize constants */
 
@@ -41,36 +43,59 @@ fn main() {
     let mut st: [u64; 25] = [0; 25];
     let mut bc: [u64; 5] = [0; 5];
 
-    /* Theta Step */
-    for i in 0..5 {
-        //bc[i] = st[i] ^ st[i + 5] ^ st[i + 10] ^ st[i + 15] ^ st[i + 20];
-        bc[i] = bitxor64(bitxor64(bitxor64(bitxor64(st[i], st[i + 5]), st[i + 10]), st[i + 15]), st[i + 20]);
-    }
-    for i in 0..5 {
-        //t = bc[(i + 4) % 5] ^ ROTL64(bc[(i + 1) % 5], 1);   
-        t = bitxor64(bc[(i + 4) % 5], ROTL64(bc[(i + 1) % 5], 1));
-        
-        j = 0;
-        while j < 25 {
-        st[j + i] ^= t;
-        j = j + 5;
+    r = 0;
+    
+    for r in 0..KECCAKF_ROUNDS {
+
+        /* Theta Step */
+        for i in 0..5 {
+            //bc[i] = st[i] ^ st[i + 5] ^ st[i + 10] ^ st[i + 15] ^ st[i + 20];
+            bc[i] = bitxor64(bitxor64(bitxor64(bitxor64(st[i], st[i + 5]), st[i + 10]), st[i + 15]), st[i + 20]);
         }
+        for i in 0..5 {
+            //t = bc[(i + 4) % 5] ^ ROTL64(bc[(i + 1) % 5], 1);   
+            t = bitxor64(bc[(i + 4) % 5], ROTL64(bc[(i + 1) % 5], 1));
+            
+            j = 0;
+            while j < 25 {
+            st[j + i] ^= t;
+            j = j + 5;
+            }
+        }
+
+
+        /* Rho Pi step */
+        t = st[1];
+        i = 0;
+        for i in 0..24 {
+            j = keccakf_piln[i];
+            bc[0] = st[j];
+            st[j] = ROTL64(t, keccakf_rotc[i]);
+            t = bc[0];
+        }
+
+
+        /* Chi Step */
+        j = 0;
+        
+        while j < 25 {
+            i = 0;
+            for i in 0..5 {
+                bc[i] = st[j + i];        
+            } i = 0;
+            for i in 0..5 {
+                // "!" in rust is the same as "~" in C
+                st[j + i] ^= (!bc[(i + 1) % 5]) & bc[(i + 2) % 5];
+            }
+            j = j + 5;
+        }
+
+        /* Iota Step*/
+        st[0] ^= keccakf_rndc[r];
+
     }
-
-
-    /* Rho Pi step */
-    t = st[1];
-    i = 0;
-    for i in 0..24 {
-        j = keccakf_piln[i];
-        bc[0] = st[j];
-        st[j] = ROTL64(t, keccakf_rotc[i]);
-        t = bc[0];
-    }
-
 
 }
-
 
 
 ///u64 XOR function, https://doc.rust-lang.org/std/primitive.u64.html
